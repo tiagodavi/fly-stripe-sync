@@ -14,7 +14,7 @@ defmodule Fly.Stripe.Invoice do
   ## Examples
 
     iex> Fly.Stripe.Invoice.create(%{id: "abcd", customer: "cus_1234"})
-    {:ok, %Fly.Stripe.Invoice{id: "abcd", customer: "cus_1234"}}
+    {:ok, %Fly.Stripe.Invoice{id: "abcd", customer: "cus_1234", total: nil}}
 
     iex> Fly.Stripe.Invoice.create(%{id: "abcd"})
     {:error, %Fly.Stripe.Error{message: "customer is required"}}
@@ -29,7 +29,7 @@ defmodule Fly.Stripe.Invoice do
   ## Examples
 
     iex> Fly.Stripe.Invoice.retrieve("abcd", %{customer: "cus_1234"})
-    %Fly.Stripe.Invoice{id: "abcd", customer: "cus_1234"}
+    %Fly.Stripe.Invoice{id: "abcd", customer: "cus_1234", total: nil}
 
     iex> Fly.Stripe.Invoice.retrieve(nil)
     ** (Fly.Stripe.Error) id is required
@@ -44,7 +44,7 @@ defmodule Fly.Stripe.Invoice do
   ## Examples
 
     iex> Fly.Stripe.Invoice.update(%Fly.Stripe.Invoice{id: "abcd", customer: "cus_1234"}, %{customer: "cus_xyz"})
-    {:ok, %Fly.Stripe.Invoice{id: "abcd", customer: "cus_xyz"}}
+    {:ok, %Fly.Stripe.Invoice{id: "abcd", customer: "cus_xyz", total: nil}}
   """
   def update(invoice, params), do: update_record(invoice, params)
 end

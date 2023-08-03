@@ -12,7 +12,7 @@ defmodule Fly.OrganizationFixtures do
       attrs
       |> Enum.into(%{
         name: "some org name",
-        stripe_customer_id: "some stripe_customer_id",
+        stripe_customer_id: "some stripe_customer_id"
       })
       |> Fly.Organizations.create_organization()
 

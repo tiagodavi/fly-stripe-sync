@@ -28,6 +28,7 @@ defmodule Fly.Billing.Invoice do
     |> validate_required(@required)
     |> put_assoc(:organization, organization)
   end
+
   @doc false
   def changeset(invoice, attrs) do
     invoice
