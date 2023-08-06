@@ -4,8 +4,6 @@ defmodule Fly.Stripe.EventSimulator do
   """
   use GenStage
 
-  alias Fly.Organizations.Usage
-
   def start_link(opts) do
     GenStage.start_link(__MODULE__, opts)
   end
@@ -22,7 +20,7 @@ defmodule Fly.Stripe.EventSimulator do
     {:noreply, [usage], state}
   end
 
-  @spec push(name :: atom(), usage :: nonempty_list(Usage.t())) :: :ok
+  @spec push(name :: atom(), usage :: map()) :: :ok
   def push(name, usage) when is_atom(name) and is_map(usage) do
     GenStage.cast(name, {:usage, usage})
   end
