@@ -6,6 +6,8 @@ defmodule Fly.Organizations.Organization do
     field :name, :string
     field :stripe_customer_id, :string
 
+    has_many :invoices, Fly.Billing.Invoice
+
     timestamps()
   end
 

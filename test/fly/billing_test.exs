@@ -78,5 +78,79 @@ defmodule Fly.BillingTest do
       invoice = invoice_fixture(org)
       assert %Ecto.Changeset{} = Billing.change_invoice(invoice)
     end
+
+    test "list_due_invoices/1 returns due invoices", %{org: org} do
+      due_date = Date.utc_today()
+
+      due_invoice =
+        invoice_fixture(org, %{
+          due_date: Date.add(due_date, -1),
+          invoiced_at: nil,
+          stripe_id: nil
+        })
+
+      _extra_invoice =
+        invoice_fixture(org, %{
+          due_date: Date.add(due_date, 1),
+          invoiced_at: nil,
+          stripe_id: nil
+        })
+
+      assert [%Billing.Invoice{id: id}] = Billing.list_due_invoices(due_date)
+      assert id == due_invoice.id
+    end
+
+    test "close_due_invoices/1 closes due invoices", %{org: org} do
+      due_date = Date.utc_today()
+
+      invoiced_at =
+        DateTime.utc_now()
+        |> DateTime.truncate(:second)
+
+      updated_at =
+        NaiveDateTime.utc_now()
+        |> NaiveDateTime.truncate(:second)
+
+      due_invoice =
+        invoice_fixture(org, %{
+          due_date: due_date,
+          invoiced_at: nil,
+          stripe_id: nil
+        })
+
+      _extra_invoice =
+        invoice_fixture(org, %{
+          due_date: Date.add(due_date, 1),
+          invoiced_at: nil,
+          stripe_id: nil
+        })
+
+      input = [
+        id: due_invoice.id,
+        stripe_id: "anything",
+        invoiced_at: invoiced_at,
+        inserted_at: updated_at,
+        updated_at: updated_at
+      ]
+
+      assert {1, [%Billing.Invoice{} = invoice]} = Billing.close_due_invoices([input])
+      assert invoice.id == due_invoice.id
+      assert invoice.invoiced_at == invoiced_at
+      assert length(Billing.list_invoices()) == 2
+    end
+
+    test "list_not_due_invoices_by_orgs/2 returns not due invoices", %{org: org} do
+      due_date = Date.utc_today()
+
+      %{id: invoice_id, organization_id: organization_id} =
+        invoice_fixture(org, %{
+          due_date: due_date,
+          invoiced_at: nil,
+          stripe_id: nil
+        })
+
+      assert [%{id: ^invoice_id, organization_id: ^organization_id, stripe_id: nil}] =
+               Billing.list_not_due_invoices_by_orgs([org.id], due_date)
+    end
   end
 end

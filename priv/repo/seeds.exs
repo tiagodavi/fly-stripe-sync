@@ -18,6 +18,12 @@ alias Fly.Repo
     stripe_customer_id: "cus_1234"
   })
 
+{:ok, _organization} =
+  Fly.Organizations.create_organization(%{
+    name: "Acme",
+    stripe_customer_id: "cus_4321"
+  })
+
 {:ok, _paid_invoice} =
   Fly.Billing.create_invoice(organization, %{
     due_date: ~D[2023-06-01],

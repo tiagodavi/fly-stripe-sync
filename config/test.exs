@@ -5,6 +5,11 @@ import Config
 # The MIX_TEST_PARTITION environment variable can be used
 # to provide built-in test partitioning in CI environment.
 # Run `mix help test` for more information.
+
+config :fly,
+  producer_module: Broadway.DummyProducer,
+  producer_options: []
+
 config :fly, Fly.Repo,
   username: "postgres",
   password: "postgres",

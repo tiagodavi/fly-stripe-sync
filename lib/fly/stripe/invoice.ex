@@ -9,7 +9,7 @@ defmodule Fly.Stripe.Invoice do
   defstruct [:id, :customer, :total]
 
   @doc """
-  Create an InvoiceItem
+  Create an Invoice
 
   ## Examples
 

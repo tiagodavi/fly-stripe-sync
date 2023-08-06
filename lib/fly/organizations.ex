@@ -13,6 +13,14 @@ defmodule Fly.Organizations do
 
   alias Fly.Organizations.Organization
 
+  @spec list_organizations_by_ids(org_ids :: nonempty_list(integer())) :: list(Organization.t())
+  def list_organizations_by_ids(org_ids) do
+    Organization
+    |> from(as: :organization)
+    |> where([organization: o], o.id in ^org_ids)
+    |> Repo.all()
+  end
+
   @doc """
   Returns the list of organizations.
 

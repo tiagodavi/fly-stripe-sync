@@ -8,7 +8,10 @@
 import Config
 
 config :fly,
-  ecto_repos: [Fly.Repo]
+  ecto_repos: [Fly.Repo],
+  env: config_env(),
+  producer_module: Fly.Stripe.EventSimulator,
+  producer_options: []
 
 # Configures the endpoint
 config :fly, FlyWeb.Endpoint,

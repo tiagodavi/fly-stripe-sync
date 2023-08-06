@@ -6,8 +6,7 @@
 
 4 - I noticed there is a rate limit on Stripe APIs, and it makes total sense, but the system must operate under this constraint.
 
-5 - Users may end up with limited usage info when there are failed synchronizations with Stripe,
-and this might force them to look for competitors instead of using Fly.io.
+5 - Users may end up with limited usage info when there are failed synchronizations with Stripe, and this might force them to look for competitors instead of using Fly.io.
 
 6 - The company can't be paid for the invoice that has been delayed due to technical issues.
 
@@ -30,6 +29,38 @@ It's important to have the system that collects usage data sending events to the
 
 15 - I decided to hide technical errors from the users, specifically for this system, because it is related to billing and may cause unwarranted concerns and biases. Instead, I chose to communicate that there's a problem without specifying the exact nature of the problem to avoid those concerns.
 
+I decided to use a simple GenServer scheduler to close invoices. However, this is not the best approach because it could start duplicate processes in a distributed system with multiple nodes and run the scheduler once for each node. To mitigate we could use Oban or some powerful scheduler. Nevertheless, this simple one helps us start and keep things simpler for now.
+
+I decided to use Mimic to have a more powerful way to mock Stripe in concurrent mode.
+https://github.com/edgurgel/mimic
+
 16 - I would include the UI part with LiveView in the next iteration of this feature so we could have something visually available.
 
-17 - I would implement more unit tests to cover more edge cases as well as integration ones in a mock instance using mock queues. I would also add more validations to avoid exceptions with weird inputs.
+17 - I would implement handling failed messages better to ensure all messages are successfully processed, even the failed ones (eventually). I would also add more unit tests to cover additional edge cases, as well as integration tests in a mock instance running with some real queues.
+
+To execute the code in dev / prod environment follow the instructions bellow:
+
+```elixir
+[producer] = Broadway.producer_names(Fly.Stripe.SyncService)
+
+{:ok, organization} =
+    Fly.Organizations.create_organization(%{
+        name: "Fly branch",
+        stripe_customer_id: "fly_stripe_customer_id"
+    })
+
+message = %{
+    "organization_id" => organization.id,
+    "stripe_customer_id" => organization.stripe_customer_id,
+    "description" => "Usage data",
+    "amount" => 42,
+    "unit_amount_decimal" => 2.5,
+    "quantity" => 20
+}
+
+due_date = Date.utc_today()
+
+Fly.Stripe.EventSimulator.push(producer, message)
+
+Fly.Billing.list_invoices()
+```
