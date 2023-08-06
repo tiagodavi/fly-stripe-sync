@@ -58,8 +58,6 @@ message = %{
     "quantity" => 20
 }
 
-due_date = Date.utc_today()
-
 Fly.Stripe.EventSimulator.push(producer, message)
 
 Fly.Billing.list_invoices()
